@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playball&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="IMG/LOGO.jpg" type="image/jpeg">
 </head>
 <body>
 <a href="#main" class="skip-link">Saltar al contenido principal</a>
@@ -17,7 +18,7 @@
 <header id="site-header" class="header">
   <div class="container header__inner">
     <a href="index.html" class="brand">
-      <span class="brand__badge" aria-hidden="true">K</span>
+      <span class="brand__badge"><img src="IMG/LOGO.jpg" alt="Kimberly Vásquez – Centro de Alisados" width="150" height="150"></span>
       <span class="brand__text">
         <span class="brand__name">Kimberly Vásquez</span>
         <span class="brand__sub">Centro de Alisados</span>
@@ -92,9 +93,8 @@
     <div class="container">
       <div class="stylist">
         <div class="reveal">
-          <div class="stylist__frame tilt">
-            <!-- TODO: reemplazar por foto real de Kimberly -->
-            <span class="stylist__frame-label">Foto de<br>Kimberly Vásquez<br>&lt;!-- TODO --&gt;</span>
+          <div class="stylist__frame tilt frame-wipe reveal">
+            <img src="IMG/FTPRO.png" alt="Kimberly Vásquez, especialista en alisado saludable" width="1128" height="1394" loading="eager">
             <div class="stylist__badge">
               <strong>+<span data-count="5">0</span> años</strong>
               <span>de experiencia en alisado y recuperación capilar <em>&lt;!-- TODO: confirmar --&gt;</em></span>
@@ -163,6 +163,22 @@
 <button type="button" id="back-to-top" class="fab fab--top" aria-label="Volver arriba">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
+
+<div class="mascot">
+  <button type="button" class="mascot__avatar" id="mascot-toggle" aria-expanded="false" aria-controls="mascot-bubble" aria-label="Habla con Kimberly">
+    <img src="IMG/FTANIMADA.jpeg" alt="Kimberly Vásquez" id="mascot-avatar" width="410" height="552">
+  </button>
+  <span class="mascot__ping" aria-hidden="true">!</span>
+  <div class="mascot__bubble" id="mascot-bubble" role="dialog" aria-label="Mensaje de Kimberly">
+    <button type="button" class="mascot__close" id="mascot-close" aria-label="Cerrar mensaje">×</button>
+    <p class="mascot__name">¡Hola! Soy Kimberly</p>
+    <p class="mascot__text">¿Lista para darle a tu cabello el cuidado que merece? Aquí puedes agendar o escribirme directo.</p>
+    <div class="mascot__actions">
+      <a href="agenda.html" class="btn btn--cta btn--sm">Agenda tu cita</a>
+      <a href="https://wa.me/573128139700?text=Hola%20Kimberly%2C%20tengo%20una%20pregunta" target="_blank" rel="noopener" class="btn btn--outline btn--sm">Escríbeme</a>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="js/config.js"></script>

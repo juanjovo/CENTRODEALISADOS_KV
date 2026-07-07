@@ -188,6 +188,46 @@
   }
 
   // ============================================================
+  // Mascota interactiva (avatar animado de Kimberly)
+  // ============================================================
+  function initMascot() {
+    var toggle = document.getElementById('mascot-toggle');
+    var bubble = document.getElementById('mascot-bubble');
+    var closeBtn = document.getElementById('mascot-close');
+    var avatar = document.getElementById('mascot-avatar');
+    if (!toggle || !bubble) return;
+
+    var open = false;
+    function setOpen(v) {
+      open = v;
+      bubble.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        var firstLink = bubble.querySelector('a, button');
+        if (firstLink) firstLink.focus({ preventScroll: true });
+      }
+    }
+    toggle.addEventListener('click', function () { setOpen(!open); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && open) { setOpen(false); toggle.focus(); }
+    });
+    document.addEventListener('click', function (e) {
+      if (open && !bubble.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    });
+
+    // Saludo periódico: cada tanto agita la mano para llamar la atención,
+    // incluso sin que nadie interactúe con ella.
+    if (avatar && !isTouch) {
+      setInterval(function () {
+        if (open) return;
+        avatar.classList.add('is-waving');
+        setTimeout(function () { avatar.classList.remove('is-waving'); }, 700);
+      }, 9000);
+    }
+  }
+
+  // ============================================================
   // Antes / Después — slider comparador
   // ============================================================
   function initBeforeAfter() {
@@ -611,6 +651,7 @@
   initTilt();
   initHeroParallax();
   initMagnetic();
+  initMascot();
   initBeforeAfter();
   initTestimonials();
   initBackToTop();

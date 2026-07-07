@@ -131,9 +131,10 @@ h1, h2, h3, p, dl, dd { margin: 0; }
 .brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .brand__badge {
   width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  background: var(--color-light); border: 1.5px solid var(--color-secondary);
+  background: var(--color-light); border: 1.5px solid var(--color-secondary); overflow: hidden;
   font-family: var(--font-display); font-size: 1.4rem; color: var(--color-cta); line-height: 1;
 }
+.brand__badge img { width: 100%; height: 100%; object-fit: cover; }
 .brand__text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand__name { font-family: var(--font-display); font-size: 1.35rem; color: var(--color-cta); }
 .brand__sub { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; color: var(--color-ink-soft); }
@@ -634,4 +635,64 @@ body.is-loaded { opacity: 1; transition: opacity .45s var(--ease); }
 @keyframes confettiBurst {
   0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
   100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+
+/* ============ MASCOTA INTERACTIVA (Kimberly animada) ============ */
+.mascot { position: fixed; left: 20px; bottom: 20px; z-index: 95; }
+
+.mascot__avatar {
+  width: 74px; height: 74px; border-radius: 50%; overflow: hidden; padding: 0; display: block;
+  border: 3px solid #fff; background: var(--color-light); box-shadow: var(--shadow-lift);
+  animation: mascotFloat 3.6s ease-in-out infinite;
+}
+.mascot__avatar img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.mascot__avatar:hover { animation: mascotWave .6s ease-in-out; }
+.mascot__avatar.is-waving { animation: mascotWave .7s ease-in-out; }
+
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-9px) rotate(-2deg); }
+}
+@keyframes mascotWave {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-10deg) scale(1.05); }
+  75% { transform: rotate(10deg) scale(1.05); }
+}
+
+.mascot__ping {
+  position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--color-cta); color: #fff; font-size: .68rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #fff;
+  animation: pingPulse 2.4s ease-in-out infinite;
+}
+@keyframes pingPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+.mascot__bubble {
+  position: absolute; bottom: 92px; left: 0; width: 250px;
+  background: #fff; border-radius: 18px; padding: 18px 18px 16px; box-shadow: var(--shadow-lift);
+  opacity: 0; transform: translateY(12px) scale(.95); transform-origin: bottom left;
+  pointer-events: none; transition: opacity .25s var(--ease), transform .25s var(--ease);
+}
+.mascot__bubble.is-open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.mascot__bubble::after {
+  content: ''; position: absolute; bottom: -7px; left: 30px; width: 14px; height: 14px;
+  background: #fff; transform: rotate(45deg); border-radius: 2px;
+}
+.mascot__close {
+  position: absolute; top: 8px; right: 10px; width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: var(--color-light); color: var(--color-ink-soft); font-size: .9rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.mascot__name { font-family: var(--font-display); font-size: 1.15rem; color: var(--color-cta); margin-bottom: 2px; }
+.mascot__text { font-size: .83rem; color: var(--color-ink-soft); line-height: 1.45; margin: 0 0 14px; }
+.mascot__actions { display: flex; flex-direction: column; gap: 8px; }
+.mascot__actions .btn { width: 100%; padding: 10px 16px; font-size: .82rem; }
+
+@media (max-width: 560px) {
+  .mascot { left: 14px; bottom: 14px; }
+  .mascot__avatar { width: 62px; height: 62px; }
+  .mascot__bubble { width: 210px; bottom: 78px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot__avatar { animation: none; }
 }
