@@ -1,0 +1,227 @@
+# PROMPT MAESTRO — PRODUCCIÓN (v5)
+## Módulo complementario — cargar SOLO cuando modo_entrega = entrega_produccion
+
+> Este archivo NO reemplaza a PROMPT_MAESTRO_CORE_v5.md — lo complementa.
+> Úsalo cuando el cliente ya compró y necesitas sitio publicable + backend real de
+> agendamiento. Ahorra tokens: si solo necesitas la demo de venta, no cargues este archivo.
+
+---
+
+<objetivo_produccion>
+Producto real, publicable y mantenible: sitio con archivos separados + backend de
+agendamiento funcional (Next.js/Supabase/Resend/Google Calendar).
+</objetivo_produccion>
+
+<arquitectura_archivos_sitio>
+/
+├── index.html              ← solo estructura semántica y contenido
+├── /assets
+│   ├── /css
+│   │   └── styles.css       ← tokens (:root), componentes y animaciones custom
+│   ├── /js
+│   │   └── main.js          ← nav, scroll reveal, WhatsApp, agenda
+│   └── /img                 ← imágenes optimizadas (o placeholders marcados)
+└── (multipágina) servicios.html, contacto.html, etc.
+
+- El HTML solo enlaza CSS y JS externos (<link>, <script src="" defer>).
+- Nada de <style>/<script> embebido salvo JSON-LD.
+- Si es multipágina, extrae header/footer repetidos a parciales o coméntalos claramente.
+- Build con Tailwind CLI/Vite si se pide compilado.
+</arquitectura_archivos_sitio>
+
+<arquitectura_archivos_agendamiento>
+Estructura de proyecto Next.js — cada responsabilidad en su propio archivo, regla dura:
+
+/app
+  /(public)
+    page.tsx                 ← landing (importa componentes, sin lógica de negocio)
+    /agenda
+      page.tsx               ← formulario público de reserva
+  /admin
+    layout.tsx               ← auth guard
+    page.tsx                 ← dashboard
+    /citas
+      page.tsx               ← lista + calendario de citas
+    /servicios
+      page.tsx               ← CRUD de servicios
+    /configuracion
+      page.tsx               ← horarios, bloqueos, conexión Google Calendar
+  /api
+    /citas
+      route.ts               ← POST crear cita
+      /[id]
+        route.ts             ← PATCH aceptar/rechazar/cancelar/reprogramar
+    /auth
+      callback/route.ts      ← OAuth callback Google Calendar
+
+/components
+  /agenda
+    SelectorServicio.tsx
+    CalendarioDisponibilidad.tsx
+    ResumenCita.tsx
+    FormularioCliente.tsx
+  /admin
+    ListaCitas.tsx
+    PanelConfiguracion.tsx
+
+/lib
+  disponibilidad.ts           ← lógica de cálculo de slots (testeable, sin JSX)
+  supabase.ts                 ← cliente Supabase
+  google-calendar.ts          ← integración OAuth + crear/eliminar evento
+  resend.ts                   ← envío de correos
+  validaciones.ts             ← esquemas Zod
+
+/emails
+  ConfirmacionCliente.tsx     ← React Email
+  NotificacionDueno.tsx
+  CitaConfirmada.tsx
+  CitaCancelada.tsx
+  RecordatorioCita.tsx        ← NUEVO en v5
+
+/supabase/migrations
+  001_esquema_inicial.sql
+
+Regla dura: la lógica de negocio (cálculo de disponibilidad, validaciones, reglas de
+estado) vive en /lib, NUNCA dentro de un componente de UI. Los componentes en
+/components solo reciben props y renderizan — cero fetch ni cálculo de fechas ahí.
+Cada componente React en su propio archivo .tsx, sin estilos inline (usar clases
+Tailwind o CSS module).
+</arquitectura_archivos_agendamiento>
+
+<stack_agendamiento>
+- Framework: Next.js 14+ (App Router) con TypeScript.
+- Base de datos + Auth: Supabase (PostgreSQL + RLS). El dueño se autentica; el cliente
+  final NO necesita cuenta.
+- Correos transaccionales: Resend (plantillas en React Email).
+- Notificación adicional: WhatsApp — link wa.me prellenado en el correo de confirmación
+  al dueño y al cliente (no requiere API de WhatsApp Business para el MVP; si el volumen
+  lo justifica más adelante, evaluar WhatsApp Business API).
+- Calendario: Google Calendar API vía OAuth 2.0 (solo el dueño conecta su calendario una
+  vez; el cliente se agrega como invitado).
+- Estilos: Tailwind CSS, mismos tokens del sitio.
+- Despliegue: Vercel.
+- Validación: Zod en cliente y servidor. Fechas con date-fns, zona horaria IANA explícita.
+</stack_agendamiento>
+
+<modelo_de_datos>
+- profesionales: id, nombre_negocio, email, zona_horaria, google_refresh_token
+  (encriptado), google_calendar_id, slug_publico.
+- servicios: id, profesional_id, nombre, duracion_min, precio, descripcion, activo.
+- horarios_laborales: id, profesional_id, dia_semana (0-6), hora_inicio, hora_fin.
+- bloqueos: id, profesional_id, fecha_inicio, fecha_fin, motivo.
+- citas: id, profesional_id, servicio_id, cliente_nombre, cliente_email,
+  cliente_telefono, fecha_hora_inicio, fecha_hora_fin,
+  estado (ENUM: pendiente | confirmada | rechazada | cancelada | completada | reprogramada),
+  google_event_id, notas, creada_en.
+- recordatorios_enviados (NUEVO): id, cita_id, tipo (24h | 2h), enviado_en — evita
+  duplicar envíos.
+
+RLS: un dueño solo lee/escribe sus propios registros. La creación de citas "pendiente"
+desde el formulario público se hace vía función de servidor con clave de servicio, nunca
+exponiendo credenciales al cliente.
+</modelo_de_datos>
+
+<calculo_disponibilidad>
+- Módulo aislado en /lib/disponibilidad.ts, testeable sin UI.
+- Toma horarios_laborales del día y divide en intervalos según duracion_min del servicio.
+- Resta slots ocupados por citas en estado pendiente o confirmada.
+- Resta rangos de bloqueos.
+- Excluye slots en el pasado (respetando zona horaria del profesional).
+- Control de concurrencia: revalidar disponibilidad dentro de la transacción de inserción
+  para impedir doble reserva.
+</calculo_disponibilidad>
+
+<flujo_estados>
+- pendiente → (dueño acepta) → confirmada
+- pendiente → (dueño rechaza) → rechazada
+- confirmada → (cliente/dueño) → cancelada
+- confirmada → (cliente/dueño solicita nueva fecha) → reprogramada → vuelve a pendiente
+  con nueva fecha_hora_inicio (NUEVO en v5 — antes no existía esta transición)
+- confirmada → (pasa la fecha) → completada
+Cada transición dispara sus acciones (correos/calendario/WhatsApp). Transiciones
+idempotentes y registradas.
+</flujo_estados>
+
+<notificaciones>
+Resend, 5 plantillas en React Email (antes 4 — se agrega recordatorio):
+
+1. AL CLIENTE (al reservar): "Recibimos tu solicitud, en espera de confirmación."
+   Incluye resumen de la cita (servicio, fecha, hora) con diseño de marca del negocio,
+   no un correo de texto plano.
+2. AL DUEÑO (al reservar): "Nueva solicitud de cita" + enlace directo al panel para
+   aceptar/rechazar + link wa.me para contactar al cliente si necesita confirmar detalles.
+3. AL CLIENTE (al aceptar): "Tu cita fue confirmada" + archivo .ics + enlace al
+   evento + link wa.me del negocio para dudas.
+4. AL CLIENTE (al rechazar/cancelar): aviso correspondiente + opción de reagendar.
+5. RECORDATORIO (NUEVO): 24h y 2h antes de la cita confirmada, correo corto con
+   fecha/hora/servicio y link para cancelar/reprogramar. Se registra en
+   recordatorios_enviados para no duplicar. Ejecutado vía cron job (Vercel Cron o
+   Supabase Edge Function programada).
+
+Todos los envíos manejan errores sin romper la transacción principal (encolar/reintentar).
+Diseño visual de las plantillas: usar los mismos tokens de marca del sitio (logo, colores,
+tipografía) — no la plantilla default de Resend/React Email sin personalizar.
+</notificaciones>
+
+<integracion_google_calendar>
+- OAuth 2.0: el dueño conecta su Google Calendar una sola vez (scope calendar.events).
+  Guarda el refresh_token de forma segura (encriptado en columna, nunca en texto plano).
+- Al CONFIRMAR: crea el evento con título, descripción, fecha/hora en zona horaria
+  correcta, email del cliente como ATTENDEE (Google envía la invitación sin que el
+  cliente conecte su cuenta), recordatorios nativos; guarda google_event_id.
+- Al CANCELAR/RECHAZAR una cita confirmada: elimina/cancela el evento por google_event_id.
+- Al REPROGRAMAR: actualiza el evento existente (no crea uno nuevo) vía google_event_id.
+</integracion_google_calendar>
+
+<panel_administrador>
+Privado, autenticado.
+- Citas en lista y calendario (semana/mes), filtrables por estado; bandeja de pendientes
+  destacada visualmente (badge con conteo).
+- Acciones rápidas: aceptar, rechazar, cancelar, marcar completada, reprogramar (nuevo).
+- CRUD de servicios (incluye precio).
+- Gestión de horarios laborales y bloqueos.
+- Botón "Conectar Google Calendar" y estado de la conexión (conectado/desconectado, con
+  fecha de última sincronización).
+- Datos de contacto del cliente por cita, con botón directo wa.me para contactarlo.
+- Indicadores: citas del día, pendientes, confirmadas de la semana, tasa de confirmación.
+- Diseño visual con los mismos tokens de marca del sitio público — el panel también debe
+  verse profesional, no un admin genérico sin estilizar.
+</panel_administrador>
+
+<reglas_codigo_produccion>
+- Nunca exponer service_role key ni tokens en el cliente. Validar todo en servidor.
+  Sanitizar entradas.
+- Zona horaria: almacenar en UTC, mostrar en la del profesional.
+- Concurrencia: impedir doble reserva del mismo slot (revalidación en transacción).
+- Cada componente React en su propio archivo; lógica de negocio solo en /lib.
+- Sin estilos inline en JSX — Tailwind o CSS module.
+- Nombres de variables/funciones en español o inglés, pero consistentes en todo el proyecto.
+</reglas_codigo_produccion>
+
+<entregables_produccion>
+1. Resumen de decisiones de arquitectura y tokens compartidos con el sitio.
+2. Estructura de carpetas del proyecto Next.js (ver arquitectura_archivos_agendamiento).
+3. Migraciones SQL del esquema (con RLS).
+4. Lógica de disponibilidad (/lib/disponibilidad.ts, aislada y testeable).
+5. Server actions/API routes: crear, aceptar, rechazar, cancelar, reprogramar cita.
+6. Integración Resend (5 plantillas, incluyendo recordatorio) y Google Calendar
+   (OAuth + crear/actualizar/eliminar evento).
+7. Formulario público (flujo de 3 pasos, mismo diseño que la demo) y panel de
+   administración con la identidad de marca aplicada.
+8. Configuración de cron job para recordatorios (Vercel Cron).
+9. .env.example con todas las variables.
+10. README con instalación, configuración de Google Cloud (OAuth) y despliegue en Vercel.
+
+Empieza por el esquema de datos y la lógica de disponibilidad antes de la UI.
+</entregables_produccion>
+
+<criterios_aceptacion_produccion>
+- Un cliente no puede reservar un horario ocupado ni en el pasado.
+- Reservar genera pendiente + correos (cliente y dueño); aceptar genera confirmada +
+  evento en Google Calendar + correo con .ics.
+- Reprogramar actualiza el evento existente sin duplicarlo.
+- Recordatorios se envían una sola vez por cita (24h y 2h), sin duplicar.
+- El dueño gestiona todo desde el panel; ningún secreto queda expuesto en el frontend.
+- El panel de administración y las plantillas de correo usan la identidad de marca del
+  negocio, no un diseño genérico sin estilizar.
+</criterios_aceptacion_produccion>

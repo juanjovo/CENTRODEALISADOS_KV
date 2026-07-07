@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda tu cita — Kimberly Vásquez | Centro de Alisados</title>
+<meta name="description" content="Reserva tu cita de alisado saludable, terapia o recuperación capilar en tres pasos. Te confirmamos por WhatsApp y correo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playball&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Saltar al contenido principal</a>
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<header id="site-header" class="header">
+  <div class="container header__inner">
+    <a href="index.html" class="brand">
+      <span class="brand__badge" aria-hidden="true">K</span>
+      <span class="brand__text"><span class="brand__name">Kimberly Vásquez</span><span class="brand__sub">Centro de Alisados</span></span>
+    </a>
+    <nav aria-label="Navegación principal" class="nav">
+      <a href="index.html" class="nav__link">Inicio</a>
+      <a href="nosotros.html" class="nav__link">Nosotros</a>
+      <a href="servicios.html" class="nav__link">Servicios</a>
+      <a href="transformaciones.html" class="nav__link">Transformaciones</a>
+      <a href="testimonios.html" class="nav__link">Testimonios</a>
+      <a href="agenda.html" class="nav__link is-active">Agenda</a>
+      <a href="contacto.html" class="nav__link">Contacto</a>
+    </nav>
+    <div class="header__actions">
+      <a href="agenda.html" class="btn btn--cta btn--sm header__cta">Agenda tu cita</a>
+      <button id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú">
+        <span class="menu-toggle__bar"></span><span class="menu-toggle__bar"></span><span class="menu-toggle__bar"></span>
+      </button>
+    </div>
+  </div>
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Navegación móvil">
+    <a href="index.html" class="mobile-menu__link">Inicio</a>
+    <a href="nosotros.html" class="mobile-menu__link">Nosotros</a>
+    <a href="servicios.html" class="mobile-menu__link">Servicios</a>
+    <a href="transformaciones.html" class="mobile-menu__link">Transformaciones</a>
+    <a href="testimonios.html" class="mobile-menu__link">Testimonios</a>
+    <a href="redes.html" class="mobile-menu__link">Redes Sociales</a>
+    <a href="agenda.html" class="mobile-menu__link">Agenda</a>
+    <a href="contacto.html" class="mobile-menu__link">Contacto</a>
+    <a href="agenda.html" class="btn btn--cta mobile-menu__cta">Agenda tu cita</a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="section section--tint" style="padding-top: calc(var(--header-h) + 56px);">
+    <div class="container container--narrow">
+      <div class="section-head reveal">
+        <p class="eyebrow">Agenda</p>
+        <h2 class="section-title">Reserva tu cita en tres pasos</h2>
+        <p class="section-lead">Selecciona tu servicio, elige día y hora, y confirma tus datos. Le avisamos a Kimberly por WhatsApp al instante, y a ti te confirmamos por correo.</p>
+      </div>
+
+      <div class="stepper reveal">
+        <div class="stepper__row">
+          <div class="step-dot is-active" id="dot-1">1</div>
+          <div class="step-line" id="line-1"></div>
+          <div class="step-dot" id="dot-2">2</div>
+          <div class="step-line" id="line-2"></div>
+          <div class="step-dot" id="dot-3">3</div>
+        </div>
+        <div class="stepper__labels"><span>Servicio</span><span>Horario</span><span>Datos</span></div>
+      </div>
+
+      <form id="booking-form" class="reveal" novalidate>
+        <div class="agenda-viewport">
+          <div class="agenda-track" id="agenda-track">
+
+            <!-- STEP 1 -->
+            <div id="step-1" class="step-panel">
+              <div class="grid-2" id="service-list" role="group" aria-label="Selecciona un servicio"></div>
+              <div class="step-actions step-actions--end">
+                <button type="button" id="to-step-2" class="btn btn--cta" disabled>Siguiente →</button>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="step-2" class="step-panel">
+              <div class="cal-head">
+                <button type="button" id="cal-prev" class="icon-btn" aria-label="Semana anterior">‹</button>
+                <p id="cal-label" class="cal-label"></p>
+                <button type="button" id="cal-next" class="icon-btn" aria-label="Semana siguiente">›</button>
+              </div>
+              <div class="cal-weekdays"><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span></div>
+              <div class="cal-grid" id="cal-grid" role="group" aria-label="Selecciona un día"></div>
+
+              <div id="time-wrap" class="time-wrap is-hidden">
+                <p class="time-wrap__label">Horarios disponibles</p>
+                <div class="time-list" id="time-list" role="group" aria-label="Selecciona una hora"></div>
+              </div>
+
+              <div class="step-actions">
+                <button type="button" id="to-step-1" class="btn btn--outline">← Atrás</button>
+                <button type="button" id="to-step-3" class="btn btn--cta" disabled>Siguiente →</button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div id="step-3" class="step-panel">
+              <div class="summary-card">
+                <p class="summary-card__label">Resumen de tu cita</p>
+                <dl class="summary-card__grid">
+                  <div><dt>Servicio</dt><dd id="summary-service"></dd></div>
+                  <div><dt>Fecha</dt><dd id="summary-date"></dd></div>
+                  <div><dt>Hora</dt><dd id="summary-time"></dd></div>
+                </dl>
+              </div>
+
+              <div class="form-grid">
+                <div class="field field--full">
+                  <label for="f-name">Nombre completo</label>
+                  <input id="f-name" name="name" type="text" required autocomplete="name">
+                  <p class="field-error" data-for="f-name">Ingresa tu nombre.</p>
+                </div>
+                <div class="field">
+                  <label for="f-email">Correo electrónico</label>
+                  <input id="f-email" name="email" type="email" required autocomplete="email">
+                  <p class="field-error" data-for="f-email">Ingresa un correo válido.</p>
+                </div>
+                <div class="field">
+                  <label for="f-phone">Teléfono (WhatsApp)</label>
+                  <input id="f-phone" name="phone" type="tel" required autocomplete="tel">
+                  <p class="field-error" data-for="f-phone">Ingresa un teléfono válido (7 a 10 dígitos).</p>
+                </div>
+              </div>
+
+              <p id="form-server-error" class="form-server-error is-hidden"></p>
+
+              <div class="step-actions">
+                <button type="button" id="to-step-2-back" class="btn btn--outline">← Atrás</button>
+                <button type="submit" id="submit-btn" class="btn btn--cta">Confirmar cita</button>
+              </div>
+            </div>
+
+            <!-- CONFIRMACIÓN -->
+            <div id="step-confirm" class="step-panel step-confirm">
+              <svg class="check-circle" width="76" height="76" viewBox="0 0 76 76" fill="none">
+                <circle cx="38" cy="38" r="35" fill="var(--color-light)" stroke="var(--color-cta)" stroke-width="2"/>
+                <path class="check-path" d="M23 39l10 10 20-20" stroke="var(--color-cta)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+              <h3>¡Solicitud enviada!</h3>
+              <p id="confirm-message">Le avisamos a Kimberly al instante por WhatsApp con todos los datos de tu cita.</p>
+              <div class="notify-actions">
+                <a id="notify-whatsapp-btn" href="#" target="_blank" rel="noopener" class="btn btn--cta">Confirmar por WhatsApp</a>
+                <a id="notify-email-btn" href="#" class="btn btn--outline">Enviar copia por correo</a>
+              </div>
+              <p class="notify-note">¿No se abrió la ventana de WhatsApp? Usa el botón de arriba para intentarlo de nuevo.</p>
+              <button type="button" id="restart-booking" class="btn btn--outline" style="margin-top:24px;">Agendar otra cita</button>
+            </div>
+
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div>
+      <p class="footer__brand">Kimberly Vásquez</p>
+      <p class="footer__tag">Resaltamos tu belleza.</p>
+      <div class="footer__socials">
+        <a href="https://www.instagram.com/centrodealisados_kv" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+        <a href="https://www.tiktok.com/@by_kimberlyv" target="_blank" rel="noopener" aria-label="TikTok">TT</a>
+        <a href="https://www.threads.net/@centrodealisados_kv" target="_blank" rel="noopener" aria-label="Threads">TH</a>
+      </div>
+    </div>
+    <nav aria-label="Navegación secundaria">
+      <p class="footer__heading">Navegación</p>
+      <a href="servicios.html">Servicios</a>
+      <a href="transformaciones.html">Transformaciones</a>
+      <a href="agenda.html">Agenda</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+    <div>
+      <p class="footer__heading">Contacto</p>
+      <p>+57 312 813 9700</p>
+      <p>Cali, Colombia</p>
+    </div>
+  </div>
+  <div class="container footer__legal">
+    © <span id="year"></span> Kimberly Vásquez – Centro de Alisados. Todos los derechos reservados.
+  </div>
+</footer>
+
+<a href="https://wa.me/573128139700?text=Hola%20Kimberly%2C%20quiero%20agendar%20una%20cita" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp" class="fab fab--whatsapp">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15.03L2 22l5.14-1.35A10 10 0 1012 2zm0 2a8 8 0 016.9 12.04l-.24.4.9 3.3-3.4-.89-.4.23A8 8 0 1112 4zm-3.13 3.9c-.2 0-.5.06-.77.36-.26.3-1 1-1 2.4s1.03 2.77 1.17 2.96c.15.2 2 3.1 4.9 4.24 2.4.95 2.9.76 3.4.71.52-.05 1.68-.68 1.92-1.35.24-.66.24-1.22.17-1.34-.07-.12-.27-.2-.56-.35-.3-.15-1.68-.83-1.94-.92-.26-.1-.45-.15-.65.15-.19.3-.74.92-.9 1.1-.17.2-.33.22-.62.08-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.14.3-.34.44-.5.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.65-1.62-.9-2.2-.23-.58-.47-.5-.65-.5z"/></svg>
+</a>
+<button type="button" id="back-to-top" class="fab fab--top" aria-label="Volver arriba">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
